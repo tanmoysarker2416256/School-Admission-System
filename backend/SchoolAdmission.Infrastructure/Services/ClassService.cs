@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using SchoolAdmission.Domain.Entities;
+using SchoolAdmission.Domain.Enums;
 using SchoolAdmission.Domain.Exceptions;
 using SchoolAdmission.Infrastructure.Persistence;
 
@@ -44,4 +45,28 @@ public class ClassService(SchoolAdmissionDbContext db)
 
         return schoolClass;
     }
+
+    public async Task<List<ClassSeatSummary>> GetAllAsync(CancellationToken ct)
+    {
+        var now = DateTime.UtcNow;
+        var classes = db.Classes.AsNoTracking().OrderBy(c => c.CreatedAt);
+        return await ToSummaries(classes, now).ToListAsync(ct);
+    }
+
+    public async Task<ClassSeatSummary> GetByIdAsync(Guid id, CancellationToken ct)
+    {
+        var now = DateTime.UtcNow;
+        var classes = db.Classes.AsNoTracking().Where(c => c.Id == id);
+        var summary = await ToSummaries(classes, now).FirstOrDefaultAsync(ct);
+
+        return summary ?? throw new NotFoundException("Class not found.");
+    }
+
+    private IQueryable<ClassSeatSummary> ToSummaries(IQueryable<SchoolClass> classes, DateTime now) =>
+        classes.Select(c => new ClassSeatSummary(
+            c.Id,
+            c.Name,
+            c.TotalSeats,
+            db.Holds.Count(h => h.ClassId == c.Id && h.Status == HoldStatus.Held && h.ExpiresAt > now),
+            db.Holds.Count(h => h.ClassId == c.Id && h.Status == HoldStatus.Confirmed)));
 }
