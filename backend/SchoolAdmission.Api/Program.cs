@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolAdmission.Api;
 using SchoolAdmission.Api.Endpoints;
+using SchoolAdmission.Infrastructure;
 using SchoolAdmission.Infrastructure.Persistence;
 using SchoolAdmission.Infrastructure.Services;
 
@@ -21,6 +22,14 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<SchoolAdmissionDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
+//hold seat
+var holdSeconds = builder.Configuration.GetValue<int?>("HOLD_DURATION_SECONDS") ?? 600;
+if (holdSeconds <= 0)
+    throw new InvalidOperationException("HOLD_DURATION_SECONDS must be greater than zero.");
+
+builder.Services.AddSingleton(new AdmissionSettings(holdSeconds));
+builder.Services.AddScoped<HoldService>();
+
 
 builder.Services.AddScoped<ClassService>();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
@@ -30,6 +39,7 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 app.MapClassEndpoints();
+app.MapHoldEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
