@@ -1,5 +1,9 @@
 using Microsoft.EntityFrameworkCore;
+using SchoolAdmission.Api;
+using SchoolAdmission.Api.Endpoints;
 using SchoolAdmission.Infrastructure.Persistence;
+using SchoolAdmission.Infrastructure.Services;
+
 
 
 
@@ -17,7 +21,15 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddDbContext<SchoolAdmissionDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Default")));
 
+
+builder.Services.AddScoped<ClassService>();
+builder.Services.AddExceptionHandler<ApiExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
+
+app.UseExceptionHandler();
+app.MapClassEndpoints();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
