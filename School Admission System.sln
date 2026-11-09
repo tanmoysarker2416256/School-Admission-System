@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.36221.1 d17.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolAdmission.Domain", "backend\SchoolAdmission.Domain\SchoolAdmission.Domain.csproj", "{2B4856AD-33AC-4A9B-84D0-13EF25CD1FE4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolAdmission.Infrastructure", "backend\SchoolAdmission.Infrastructure\SchoolAdmission.Infrastructure.csproj", "{399F1490-E9EB-4DA9-AF3D-377DF61FC08C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{2B4856AD-33AC-4A9B-84D0-13EF25CD1FE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B4856AD-33AC-4A9B-84D0-13EF25CD1FE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B4856AD-33AC-4A9B-84D0-13EF25CD1FE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{399F1490-E9EB-4DA9-AF3D-377DF61FC08C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{399F1490-E9EB-4DA9-AF3D-377DF61FC08C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{399F1490-E9EB-4DA9-AF3D-377DF61FC08C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{399F1490-E9EB-4DA9-AF3D-377DF61FC08C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
