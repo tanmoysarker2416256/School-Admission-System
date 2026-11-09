@@ -28,13 +28,10 @@ public class HoldConfiguration : IEntityTypeConfiguration<Hold>
         // seat counting per class
         builder.HasIndex(h => new { h.ClassId, h.Status, h.ExpiresAt });
 
-        // "my holds" lookup
-        builder.HasIndex(h => h.StudentId);
-
-        // one active hold per student per class, enforced by PostgreSQL
-        builder.HasIndex(h => new { h.StudentId, h.ClassId })
+        // one active hold or confirmed seat per student across ALL classes, enforced by PostgreSQL
+        builder.HasIndex(h => h.StudentId)
             .IsUnique()
             .HasFilter("\"Status\" IN ('Held','Confirmed')")
-            .HasDatabaseName("ux_holds_one_active_per_student_per_class");
+            .HasDatabaseName("ux_holds_one_active_per_student");
     }
 }
