@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SchoolAdmission.Api;
 using SchoolAdmission.Api.Endpoints;
+using SchoolAdmission.Api.Workers;
 using SchoolAdmission.Infrastructure;
 using SchoolAdmission.Infrastructure.Persistence;
 using SchoolAdmission.Infrastructure.Services;
@@ -34,6 +35,7 @@ builder.Services.AddScoped<HoldService>();
 builder.Services.AddScoped<ClassService>();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 builder.Services.AddProblemDetails();
+builder.Services.AddHostedService<ExpiredHoldCleaner>();
 
 var app = builder.Build();
 
