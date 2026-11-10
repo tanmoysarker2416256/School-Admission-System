@@ -3,10 +3,11 @@ import ApplicationPanel from './features/application/ApplicationPanel';
 import MyApplications from './features/application/MyApplications';
 import ClassList from './features/classes/ClassList';
 import StudentIdBox, { isValidStudentId } from './features/student/StudentIdBox';
+import CreateClassForm from './features/admin/CreateClassForm';
 
 const STORAGE_KEY = 'studentId';
 
-type View = 'classes' | 'applications';
+type View = 'classes' | 'applications' | 'admin';
 
 export default function App() {
     const [studentId, setStudentId] = useState<string | null>(() => {
@@ -35,6 +36,9 @@ export default function App() {
                 <button disabled={view === 'applications'} onClick={() => setView('applications')}>
                     My applications
                 </button>
+                <button disabled={view === 'admin'} onClick={() => setView('admin')}>
+                    Admin
+                </button>
             </nav>
 
             {view === 'classes' && (
@@ -52,6 +56,14 @@ export default function App() {
                 ) : (
                     <p>Enter your 17-digit student ID above to see your applications.</p>
                 ))}
+
+            {view === 'admin' && (
+                <>
+                    <CreateClassForm onCreated={refresh} />
+                    <ClassList studentId={null} refreshKey={refreshKey} onChanged={refresh} showApply={false} />
+                </>
+            )}
+
         </main>
     );
 }

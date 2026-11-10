@@ -6,12 +6,13 @@ import type { ClassSeats } from '../../api/types';
 const REFRESH_MS = 5000;
 
 interface Props {
-  studentId: string | null;
-  refreshKey: number;
-  onChanged: () => void;
+    studentId: string | null;
+    refreshKey: number;
+    onChanged: () => void;
+    showApply?: boolean;
 }
 
-export default function ClassList({ studentId, refreshKey, onChanged }: Props) {
+export default function ClassList({ studentId, refreshKey, onChanged, showApply = true }: Props) {
     const [classes, setClasses] = useState<ClassSeats[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -63,7 +64,7 @@ export default function ClassList({ studentId, refreshKey, onChanged }: Props) {
 
     return (
         <section>
-            {!studentId && <p>Enter your 17-digit student ID above to apply.</p>}
+            {showApply && !studentId && <p>Enter your 17-digit student ID above to apply.</p>}
             {error && <p role="alert">{error}</p>}
             {message && <p role={message.ok ? 'status' : 'alert'}>{message.text}</p>}
 
@@ -78,7 +79,7 @@ export default function ClassList({ studentId, refreshKey, onChanged }: Props) {
                             <th>Held</th>
                             <th>Confirmed</th>
                             <th>Available</th>
-                            <th></th>
+                            {showApply && <th></th>}
                         </tr>
                     </thead>
                     <tbody>
@@ -89,14 +90,16 @@ export default function ClassList({ studentId, refreshKey, onChanged }: Props) {
                                 <td>{c.heldSeats}</td>
                                 <td>{c.confirmedSeats}</td>
                                 <td>{c.availableSeats}</td>
-                                <td>
-                                    <button
-                                        disabled={!studentId || applyingId !== null || c.availableSeats === 0}
-                                        onClick={() => handleApply(c.id)}
-                                    >
-                                        {c.availableSeats === 0 ? 'Full' : applyingId === c.id ? 'Applying...' : 'Apply'}
-                                    </button>
-                                </td>
+                                {showApply && (
+                                    <td>
+                                        <button
+                                            disabled={!studentId || applyingId !== null || c.availableSeats === 0}
+                                            onClick={() => handleApply(c.id)}
+                                        >
+                                            {c.availableSeats === 0 ? 'Full' : applyingId === c.id ? 'Applying...' : 'Apply'}
+                                        </button>
+                                    </td>
+                                )}
                             </tr>
                         ))}
                     </tbody>

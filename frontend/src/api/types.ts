@@ -20,3 +20,8 @@ export interface MyHold {
     status: 'HELD' | 'CONFIRMED' | 'EXPIRED' | 'CANCELLED';
     expiresAt: string;
 }
+export interface ClassCreated {
+    id: string;
+    name: string;
+    totalSeats: number;
+}
