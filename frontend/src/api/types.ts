@@ -6,3 +6,10 @@ export interface ClassSeats {
     confirmedSeats: number;
     availableSeats: number;
 }
+export interface HoldCreated {
+    holdId: string;
+    classId: string;
+    studentId: string;
+    status: string;
+    expiresAt: string;
+}
