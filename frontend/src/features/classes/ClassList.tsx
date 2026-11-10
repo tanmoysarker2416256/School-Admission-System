@@ -6,10 +6,12 @@ import type { ClassSeats } from '../../api/types';
 const REFRESH_MS = 5000;
 
 interface Props {
-    studentId: string | null;
+  studentId: string | null;
+  refreshKey: number;
+  onChanged: () => void;
 }
 
-export default function ClassList({ studentId }: Props) {
+export default function ClassList({ studentId, refreshKey, onChanged }: Props) {
     const [classes, setClasses] = useState<ClassSeats[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
@@ -27,27 +29,33 @@ export default function ClassList({ studentId }: Props) {
         }
     }, []);
 
+
+
     useEffect(() => {
         load();
         const timer = setInterval(load, REFRESH_MS);
         return () => clearInterval(timer);
     }, [load]);
 
+    useEffect(() => {
+        load();
+        const timer = setInterval(load, REFRESH_MS);
+        return () => clearInterval(timer);
+    }, [load, refreshKey]);
+
+
+
     async function handleApply(classId: string) {
         if (!studentId) return;
         setApplyingId(classId);
         setMessage(null);
         try {
-            const hold = await applyForSeat(classId, studentId);
-            setMessage({
-                ok: true,
-                text: `Seat held. Please confirm before ${new Date(hold.expiresAt).toLocaleTimeString()}.`,
-            });
+            await applyForSeat(classId, studentId);
+            onChanged();   // the application panel and the class list both reload
         } catch (e) {
             setMessage({ ok: false, text: (e as Error).message });
         } finally {
             setApplyingId(null);
-            load();
         }
     }
 
