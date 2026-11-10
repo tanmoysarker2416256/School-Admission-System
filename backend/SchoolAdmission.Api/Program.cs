@@ -36,9 +36,12 @@ builder.Services.AddScoped<ClassService>();
 builder.Services.AddExceptionHandler<ApiExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddHostedService<ExpiredHoldCleaner>();
+builder.Services.AddCors(options =>
+    options.AddDefaultPolicy(policy => policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
 var app = builder.Build();
 
+app.UseCors();
 app.UseExceptionHandler();
 app.MapClassEndpoints();
 app.MapHoldEndpoints();
@@ -50,7 +53,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+
 
 app.UseAuthorization();
 
