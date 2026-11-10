@@ -73,4 +73,93 @@ public class HoldService(SchoolAdmissionDbContext db, AdmissionSettings settings
         await tx.CommitAsync(ct);
         return hold;
     }
+
+
+    public async Task<Hold> GetAsync(Guid holdId, CancellationToken ct) =>
+    await db.Holds.AsNoTracking().FirstOrDefaultAsync(h => h.Id == holdId, ct)
+        ?? throw new NotFoundException("Application not found.");
+
+    public async Task<Hold> ConfirmAsync(Guid holdId, string? studentId, CancellationToken ct)
+    {
+        studentId = StudentIdRules.Normalize(studentId);
+
+        await using var tx = await db.Database.BeginTransactionAsync(ct);
+        var now = DateTime.UtcNow;
+        var hold = await LockHoldAsync(holdId, ct);
+
+        if (hold.StudentId != studentId)
+            throw new ForbiddenException("This application belongs to another student.");
+
+        switch (hold.EffectiveStatus(now))
+        {
+            case HoldStatus.Confirmed:
+                return hold;   // confirming again is fine; the seat is counted only once
+            case HoldStatus.Cancelled:
+                throw new ConflictException("This application was cancelled.");
+            case HoldStatus.Expired:
+                throw new ConflictException("This application has expired. Please apply again.");
+        }
+
+        hold.Status = HoldStatus.Confirmed;
+        hold.ConfirmedAt = now;
+        await db.SaveChangesAsync(ct);
+        await tx.CommitAsync(ct);
+        return hold;
+    }
+
+    public async Task CancelAsync(Guid holdId, string? studentId, CancellationToken ct)
+    {
+        studentId = StudentIdRules.Normalize(studentId);
+
+        await using var tx = await db.Database.BeginTransactionAsync(ct);
+        var now = DateTime.UtcNow;
+        var hold = await LockHoldAsync(holdId, ct);
+
+        if (hold.StudentId != studentId)
+            throw new ForbiddenException("This application belongs to another student.");
+
+        switch (hold.EffectiveStatus(now))
+        {
+            case HoldStatus.Confirmed:
+                throw new ConflictException("A confirmed application cannot be cancelled.");
+            case HoldStatus.Cancelled:
+            case HoldStatus.Expired:
+                return;   // nothing left to cancel
+        }
+
+        hold.Status = HoldStatus.Cancelled;
+        hold.CancelledAt = now;
+        await db.SaveChangesAsync(ct);
+        await tx.CommitAsync(ct);
+    }
+
+    public async Task<List<MyHoldSummary>> GetMineAsync(string? studentId, CancellationToken ct)
+    {
+        studentId = StudentIdRules.Normalize(studentId);
+        var now = DateTime.UtcNow;
+
+        var rows = await db.Holds.AsNoTracking()
+            .Where(h => h.StudentId == studentId)
+            .OrderByDescending(h => h.CreatedAt)
+            .Select(h => new { h.Id, h.ClassId, ClassName = h.SchoolClass!.Name, h.Status, h.ExpiresAt })
+            .ToListAsync(ct);
+
+        return rows
+            .Select(r => new MyHoldSummary(
+                r.Id, r.ClassId, r.ClassName,
+                r.Status == HoldStatus.Held && r.ExpiresAt <= now ? HoldStatus.Expired : r.Status,
+                r.ExpiresAt))
+            .ToList();
+    }
+
+    // locks the hold row so concurrent confirm/cancel calls for it run one at a time
+    private async Task<Hold> LockHoldAsync(Guid holdId, CancellationToken ct)
+    {
+        var hold = (await db.Holds
+                .FromSqlInterpolated($"SELECT * FROM holds WHERE \"Id\" = {holdId} FOR UPDATE")
+                .ToListAsync(ct))
+            .SingleOrDefault();
+
+        return hold ?? throw new NotFoundException("Application not found.");
+    }
 }
