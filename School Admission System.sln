@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolAdmission.Infrastruct
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolAdmission.Api", "backend\SchoolAdmission.Api\SchoolAdmission.Api.csproj", "{21E3459F-2156-4C47-936B-781C65BBD25B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SchoolAdmission.Tests", "backend\SchoolAdmission.Tests\SchoolAdmission.Tests.csproj", "{5CABAFF6-499F-4C8D-A3A9-E9A9CB9E405B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{21E3459F-2156-4C47-936B-781C65BBD25B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{21E3459F-2156-4C47-936B-781C65BBD25B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{21E3459F-2156-4C47-936B-781C65BBD25B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CABAFF6-499F-4C8D-A3A9-E9A9CB9E405B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CABAFF6-499F-4C8D-A3A9-E9A9CB9E405B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CABAFF6-499F-4C8D-A3A9-E9A9CB9E405B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CABAFF6-499F-4C8D-A3A9-E9A9CB9E405B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
