@@ -72,27 +72,25 @@ In Windows `cmd`, use double quotes and escape the inner ones: `-d "{\"name\":\"
 
 ## Tests
 
-Backend tests (rules and concurrency) run against a real PostgreSQL, because the seat safety depends on database locks. They need the .NET 8 SDK and an empty database whose name ends in `_test`.
-
-With the Docker database running (`docker compose up -d db`):
+Backend tests (rules and concurrency) run against a real PostgreSQL, because the seat safety depends on database locks. With only Docker installed, run:
 
 ```
-docker compose exec db psql -U postgres -c "CREATE DATABASE school_admission_test;"
+docker compose --profile test run --rm tests
 ```
 
-Then set the connection string and run the tests:
+The first run takes longer because it restores packages inside the container. The tests create their own `school_admission_test` database, and they finish with all tests passed. The concurrency tests start many requests at the same moment and check that held + confirmed seats never exceed the total.
+
+To run them outside Docker instead, you need the .NET 8 SDK and an empty PostgreSQL database whose name ends in `_test`:
 
 ```
 # Windows cmd
-set TEST_DB_CONNECTION=Host=localhost;Port=5433;Database=school_admission_test;Username=postgres;Password=postgres
+set TEST_DB_CONNECTION=Host=localhost;Port=5432;Database=school_admission_test;Username=postgres;Password=your_password
 dotnet test backend/SchoolAdmission.Tests
 
 # macOS / Linux
-export TEST_DB_CONNECTION="Host=localhost;Port=5433;Database=school_admission_test;Username=postgres;Password=postgres"
+export TEST_DB_CONNECTION="Host=localhost;Port=5432;Database=school_admission_test;Username=postgres;Password=your_password"
 dotnet test backend/SchoolAdmission.Tests
 ```
-
-The concurrency tests start many requests at the same moment and check that held + confirmed seats never exceed the total.
 
 ## Structure
 
